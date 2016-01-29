@@ -1,0 +1,170 @@
+package com.niharg.popularmovies;
+
+
+import android.content.Context;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.GridView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class MovieFragment extends Fragment {
+
+    MovieGridAdapter mAdapter;
+
+    public MovieFragment() {
+        // Required empty public constructor
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_movie, container, false);
+        FetchDataTask dataTask = new FetchDataTask(getContext());
+        dataTask.execute("123");
+        GridView movieGrid = (GridView) v.findViewById(R.id.poster_grid);
+        mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
+        movieGrid.setAdapter(mAdapter);
+        return v;
+    }
+
+
+    public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
+
+        public static final String TMDB_BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
+
+        public static final String PARAM_API_KEY = "api_key";
+        public static final String PARAM_SORT_BY = "sort_by";
+
+
+        public static final String KEY_TITLE = "title";
+        public static final String KEY_OTITLE = "original_title";
+        public static final String KEY_ID = "id";
+        public static final String KEY_POSTER = "poster_path";
+        public static final String KEY_DESC = "overview";
+        public static final String KEY_REL_DATE = "release_date";
+
+
+        private Context mContext;
+
+        FetchDataTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected Movie[] doInBackground(String... params) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            String responseJson;
+
+            try {
+                Uri uri = Uri.parse(TMDB_BASE_URL).buildUpon()
+                        .appendQueryParameter(PARAM_SORT_BY, "popularity.desc")
+                        .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key))
+                        .build();
+
+                URL url = new URL(uri.toString());
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuilder buffer = new StringBuilder();
+                if(inputStream == null) {
+                    //Nothing to do
+                    responseJson = null;
+                }
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while((line = reader.readLine()) != null) {
+                    buffer.append(line).append("\n");
+                }
+
+                if(buffer.length() == 0) {
+                    //Empty String
+                    responseJson = null;
+                }
+
+                responseJson = buffer.toString();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                responseJson = null;
+            } finally {
+                if(urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+
+                if(reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            try {
+                return parseJson(responseJson);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        private Movie[] parseJson(String jsonString) throws JSONException {
+            JSONObject dataObj = new JSONObject(jsonString);
+            JSONArray results = dataObj.getJSONArray("results");
+            Movie[] data = new Movie[results.length()];
+
+            for(int i = 0; i < results.length(); i++) {
+                JSONObject temp = results.getJSONObject(i);
+                data[i] = new Movie(temp.getString(KEY_TITLE),
+                        temp.getString(KEY_DESC),
+                        temp.getString(KEY_POSTER),
+                        temp.getString(KEY_REL_DATE),
+                        temp.getLong(KEY_ID),
+                        temp.getString(KEY_OTITLE));
+            }
+
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(Movie[] movies) {
+            super.onPostExecute(movies);
+            for(Movie m: movies) {
+                mAdapter.add(m);
+                Log.v(this.toString(), m.getTitle());
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+}

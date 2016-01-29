@@ -12,3 +12,4 @@
 *.apk
 *.ap_
 
+app/src/main/res/values/api-keys.xml
