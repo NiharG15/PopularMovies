@@ -2,6 +2,7 @@ package com.niharg.popularmovies;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -52,6 +54,15 @@ public class MovieFragment extends Fragment {
         GridView movieGrid = (GridView) v.findViewById(R.id.poster_grid);
         mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
         movieGrid.setAdapter(mAdapter);
+        movieGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getContext(), MovieDetailActivity.class);
+                i.putExtra(MovieDetailActivity.ARG_MOVIE, (Movie) parent.getItemAtPosition(position));
+                startActivity(i);
+            }
+        });
+
         return v;
     }
 
@@ -93,6 +104,8 @@ public class MovieFragment extends Fragment {
         public static final String KEY_POSTER = "poster_path";
         public static final String KEY_DESC = "overview";
         public static final String KEY_REL_DATE = "release_date";
+        public static final String KEY_BACKDROP = "backdrop_path";
+        public static final String KEY_VOTE_AVG = "vote_average";
 
 
         private Context mContext;
@@ -179,7 +192,9 @@ public class MovieFragment extends Fragment {
                         temp.getString(KEY_POSTER),
                         temp.getString(KEY_REL_DATE),
                         temp.getLong(KEY_ID),
-                        temp.getString(KEY_OTITLE));
+                        temp.getString(KEY_OTITLE),
+                        temp.getString(KEY_BACKDROP),
+                        temp.getString(KEY_VOTE_AVG));
             }
 
             return data;

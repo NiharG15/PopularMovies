@@ -8,4 +8,6 @@
     <string name="string_sort_by">Sort By</string>
     <string name="string_popularity">Popularity</string>
     <string name="string_highest_rated">Highest Rated</string>
+    <string name="string_release_date">Release Date:</string>
+    <string name="string_rating">Rating:</string>
 </resources>
