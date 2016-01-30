@@ -6,7 +6,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -39,16 +43,39 @@ public class MovieFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_movie, container, false);
+
         FetchDataTask dataTask = new FetchDataTask(getContext());
-        dataTask.execute("123");
+        dataTask.execute(FetchDataTask.SORT_BY_POPULARITY);
         GridView movieGrid = (GridView) v.findViewById(R.id.poster_grid);
         mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
         movieGrid.setAdapter(mAdapter);
         return v;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_fragment_movie, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.sort_by_popularity:
+                Log.d(this.toString(), "Sort by popularity");
+                new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_POPULARITY);
+                return true;
+            case R.id.sort_by_rating:
+                Log.d(this.toString(), "Sort by rating");
+                new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_RATING);
+                return true;
+            default:
+                return false;
+        }
+    }
 
     public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
 
@@ -57,6 +84,8 @@ public class MovieFragment extends Fragment {
         public static final String PARAM_API_KEY = "api_key";
         public static final String PARAM_SORT_BY = "sort_by";
 
+        public static final String SORT_BY_POPULARITY = "popularity.desc";
+        public static final String SORT_BY_RATING = "vote_average.desc";
 
         public static final String KEY_TITLE = "title";
         public static final String KEY_OTITLE = "original_title";
@@ -81,8 +110,9 @@ public class MovieFragment extends Fragment {
 
             try {
                 Uri uri = Uri.parse(TMDB_BASE_URL).buildUpon()
-                        .appendQueryParameter(PARAM_SORT_BY, "popularity.desc")
+                        .appendQueryParameter(PARAM_SORT_BY, params[0])
                         .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key))
+                        .appendQueryParameter("vote_count.gte", "500")
                         .build();
 
                 URL url = new URL(uri.toString());
@@ -158,6 +188,7 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(Movie[] movies) {
             super.onPostExecute(movies);
+            mAdapter.clear();
             for(Movie m: movies) {
                 mAdapter.add(m);
             }

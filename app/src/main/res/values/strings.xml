@@ -5,4 +5,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="content_desc_movie_poster">Movie Poster</string>
+    <string name="string_sort_by">Sort By</string>
+    <string name="string_popularity">Popularity</string>
+    <string name="string_highest_rated">Highest Rated</string>
 </resources>
