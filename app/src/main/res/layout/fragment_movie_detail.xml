@@ -35,6 +35,7 @@
 
             <ImageView
                 android:id="@+id/poster"
+                android:transitionName="poster"
                 android:layout_width="180dp"
                 android:layout_height="270dp"
                 android:scaleType="centerCrop"

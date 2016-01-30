@@ -5,6 +5,7 @@
     android:layout_width="match_parent">
 <ImageView
     android:id="@+id/thumbnail"
+    android:transitionName="poster"
     android:scaleType="centerCrop"
     android:layout_height="270dp"
     android:layout_width="match_parent"

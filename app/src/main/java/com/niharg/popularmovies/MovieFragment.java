@@ -1,12 +1,17 @@
 package com.niharg.popularmovies;
 
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -28,6 +34,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -55,11 +62,21 @@ public class MovieFragment extends Fragment {
         mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
         movieGrid.setAdapter(mAdapter);
         movieGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getContext(), MovieDetailActivity.class);
                 i.putExtra(MovieDetailActivity.ARG_MOVIE, (Movie) parent.getItemAtPosition(position));
-                startActivity(i);
+                View statusBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.statusBarBackground);
+                View navigationBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.navigationBarBackground);
+                View toolbar = getActivity().findViewById(R.id.toolbar);
+                List<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
+                pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
+                pairs.add(Pair.create(view, "poster"));
+                pairs.add(Pair.create(toolbar, "toolbar"));
+                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), pairs.toArray(new Pair[pairs.size()]));
+                ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle());
             }
         });
 
