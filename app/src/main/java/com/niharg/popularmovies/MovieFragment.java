@@ -43,11 +43,10 @@ import java.util.List;
 public class MovieFragment extends Fragment {
 
     MovieGridAdapter mAdapter;
-
+    GridView mMovieGrid;
     public MovieFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,10 +57,11 @@ public class MovieFragment extends Fragment {
 
         FetchDataTask dataTask = new FetchDataTask(getContext());
         dataTask.execute(FetchDataTask.SORT_BY_POPULARITY);
-        GridView movieGrid = (GridView) v.findViewById(R.id.poster_grid);
+
+        mMovieGrid = (GridView) v.findViewById(R.id.poster_grid);
         mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
-        movieGrid.setAdapter(mAdapter);
-        movieGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mMovieGrid.setAdapter(mAdapter);
+        mMovieGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -152,7 +152,6 @@ public class MovieFragment extends Fragment {
                         }
 
                 Uri uri = uriBuilder.build();
-                Log.d(this.toString(), uri.toString());
                 URL url = new URL(uri.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();
