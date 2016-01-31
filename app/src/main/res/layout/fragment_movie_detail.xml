@@ -10,7 +10,8 @@
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:src="@mipmap/ic_launcher"/>
+        tools:src="@mipmap/ic_launcher"
+        android:contentDescription="@string/string_cd_backdrop" />
 
 
     <ScrollView
@@ -24,10 +25,10 @@
             <TextView
                 android:id="@+id/title"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:textSize="@dimen/font_size_large"
+                android:layout_marginTop="@dimen/std_vertical_margin"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="Avengers: Age of Ultron" />
@@ -39,15 +40,15 @@
                 android:layout_width="180dp"
                 android:layout_height="270dp"
                 android:scaleType="centerCrop"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginTop="@dimen/std_vertical_margin"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
                 android:layout_below="@id/title"
                 tools:src="@mipmap/ic_launcher" />
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
+                android:layout_marginTop="@dimen/std_vertical_margin"
                 android:id="@+id/relDateTitle"
                 android:layout_toRightOf="@id/poster"
                 android:text="@string/string_release_date"
@@ -57,20 +58,20 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:id="@+id/relDate"
                 android:layout_toRightOf="@id/poster"
                 android:layout_below="@id/relDateTitle"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/font_size_std"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
+                android:layout_marginTop="@dimen/std_vertical_margin"
                 android:id="@+id/ratingTitle"
                 android:layout_toRightOf="@id/poster"
                 android:text="@string/string_rating"
@@ -80,21 +81,21 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:id="@+id/rating"
                 android:layout_toRightOf="@id/poster"
                 android:layout_below="@id/ratingTitle"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/font_size_std"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
+                android:layout_marginTop="@dimen/std_vertical_margin"
                 android:id="@+id/origTitleTitle"
                 android:layout_toRightOf="@id/poster"
                 android:text="@string/string_original_title"
@@ -104,24 +105,24 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:id="@+id/originalTitle"
                 android:layout_toRightOf="@id/poster"
                 android:layout_below="@id/origTitleTitle"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/font_size_std"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/overview"
                 android:layout_below="@id/poster"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/std_vertical_margin"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:textSize="@dimen/font_size_std"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
