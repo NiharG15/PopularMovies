@@ -59,6 +59,7 @@ public class MovieDetailFragment extends Fragment {
         TextView relDate = (TextView) v.findViewById(R.id.relDate);
         TextView overview = (TextView) v.findViewById(R.id.overview);
         TextView rating = (TextView) v.findViewById(R.id.rating);
+        TextView origTitle = (TextView) v.findViewById(R.id.originalTitle);
 
         Picasso.with(getContext()).load(MovieGridAdapter.TMDB_IMAGE_BASE_URL + mMovie.getPosterPath()).into(poster);
         Picasso.with(getContext()).load(TMDB_BACKDROP_BASE_URL + mMovie.getBackdropPath()).into(backdrop);
@@ -71,6 +72,7 @@ public class MovieDetailFragment extends Fragment {
         relDate.setText(DateFormat.format("MMMM dd, yyyy", date));
         overview.setText(mMovie.getDescription());
         rating.setText(String.format("%2.1f / 10", Double.parseDouble(mMovie.getVoteAvg())));
+        origTitle.setText(mMovie.getOrigTitle());
 
         return v;
     }

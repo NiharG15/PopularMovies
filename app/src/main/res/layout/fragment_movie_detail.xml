@@ -90,6 +90,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+
+            <TextView
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:id="@+id/origTitleTitle"
+                android:layout_toRightOf="@id/poster"
+                android:text="@string/string_original_title"
+                android:textColor="@android:color/white"
+                android:layout_below="@id/rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:id="@+id/originalTitle"
+                android:layout_toRightOf="@id/poster"
+                android:layout_below="@id/origTitleTitle"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <TextView
                 android:id="@+id/overview"
                 android:layout_below="@id/poster"
