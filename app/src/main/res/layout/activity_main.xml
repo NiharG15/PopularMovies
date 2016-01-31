@@ -13,19 +13,23 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:transitionName="toolbar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 
-    <fragment
+    <!--<fragment-->
+        <!--android:layout_below="@id/toolbar"-->
+        <!--android:id="@+id/main_fragment"-->
+        <!--android:name="com.niharg.popularmovies.MovieFragment"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_width="match_parent"-->
+        <!--tools:layout="@layout/fragment_movie" />-->
+
+    <FrameLayout
+        android:id="@+id/moviefrag_container"
         android:layout_below="@id/toolbar"
-        android:id="@+id/main_fragment"
-        android:name="com.niharg.popularmovies.MovieFragment"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        tools:layout="@layout/fragment_movie" />
-
-
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

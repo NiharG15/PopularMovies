@@ -14,7 +14,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        if(savedInstanceState == null) {
+            MovieFragment movieFragment = new MovieFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.moviefrag_container, movieFragment, "movie_fragment").commit();
+        }
     }
 
     @Override
