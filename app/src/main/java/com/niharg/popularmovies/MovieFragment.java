@@ -143,12 +143,16 @@ public class MovieFragment extends Fragment {
             String responseJson;
 
             try {
-                Uri uri = Uri.parse(TMDB_BASE_URL).buildUpon()
+                Uri.Builder uriBuilder = Uri.parse(TMDB_BASE_URL).buildUpon()
                         .appendQueryParameter(PARAM_SORT_BY, params[0])
-                        .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key))
-                        .appendQueryParameter("vote_count.gte", "500")
-                        .build();
+                        .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key));
+                //Vote count condition to get relevant results
+                        if(params[0].equals(SORT_BY_RATING)) {
+                            uriBuilder.appendQueryParameter("vote_count.gte", "500");
+                        }
 
+                Uri uri = uriBuilder.build();
+                Log.d(this.toString(), uri.toString());
                 URL url = new URL(uri.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();
