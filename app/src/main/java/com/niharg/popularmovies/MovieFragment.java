@@ -67,16 +67,20 @@ public class MovieFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getContext(), MovieDetailActivity.class);
                 i.putExtra(MovieDetailActivity.ARG_MOVIE, (Movie) parent.getItemAtPosition(position));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 View statusBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.statusBarBackground);
                 View navigationBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.navigationBarBackground);
                 View toolbar = getActivity().findViewById(R.id.toolbar);
                 List<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                pairs.add(Pair.create(toolbar, "toolbar"));
                 pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
                 pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
                 pairs.add(Pair.create(view, "poster"));
-                pairs.add(Pair.create(toolbar, "toolbar"));
                 ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), pairs.toArray(new Pair[pairs.size()]));
-                ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle());
+                ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle()); }
+                else {
+                    startActivity(i);
+                }
             }
         });
 

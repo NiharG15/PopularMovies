@@ -20,7 +20,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             /*
                 Code taken from: http://stackoverflow.com/questions/26600263/how-do-i-prevent-the-status-bar-and-navigation-bar-from-animating-during-an-acti
 
-             */
+            */
 
             Transition fade = new Fade();
             fade.excludeTarget(android.R.id.statusBarBackground, true);
