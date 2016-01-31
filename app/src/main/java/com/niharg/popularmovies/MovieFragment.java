@@ -4,6 +4,8 @@ package com.niharg.popularmovies;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,7 +60,13 @@ public class MovieFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_movie, container, false);
 
         FetchDataTask dataTask = new FetchDataTask(getContext());
-        dataTask.execute(FetchDataTask.SORT_BY_POPULARITY);
+        NetworkInfo networkInfo = ((ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()) {
+            dataTask.execute(FetchDataTask.SORT_BY_POPULARITY);
+        } else {
+            Toast.makeText(getContext(), R.string.string_network_unavail, Toast.LENGTH_SHORT).show();
+        }
+
 
         mMovieGrid = (GridView) v.findViewById(R.id.poster_grid);
         mAdapter = new MovieGridAdapter(getContext(), new ArrayList<Movie>());
@@ -70,16 +78,16 @@ public class MovieFragment extends Fragment {
                 Intent i = new Intent(getContext(), MovieDetailActivity.class);
                 i.putExtra(MovieDetailActivity.ARG_MOVIE, (Movie) parent.getItemAtPosition(position));
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                View statusBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.statusBarBackground);
-                View navigationBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.navigationBarBackground);
-                View toolbar = getActivity().findViewById(R.id.toolbar);
-                List<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-                pairs.add(Pair.create(toolbar, "toolbar"));
-                pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
-                pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
-                pairs.add(Pair.create(view, "poster"));
-                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), pairs.toArray(new Pair[pairs.size()]));
-                ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle()); }
+                    View statusBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.statusBarBackground);
+                    View navigationBar = getActivity().getWindow().getDecorView().findViewById(android.R.id.navigationBarBackground);
+                    View toolbar = getActivity().findViewById(R.id.toolbar);
+                    List<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                    pairs.add(Pair.create(toolbar, "toolbar"));
+                    pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
+                    pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
+                    pairs.add(Pair.create(view, "poster"));
+                    ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), pairs.toArray(new Pair[pairs.size()]));
+                    ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle()); }
                 else {
                     startActivity(i);
                 }
@@ -97,14 +105,21 @@ public class MovieFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        NetworkInfo networkInfo = ((ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         switch(item.getItemId()) {
             case R.id.sort_by_popularity:
-                Log.d(this.toString(), "Sort by popularity");
-                new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_POPULARITY);
+                if(networkInfo != null && networkInfo.isConnected()) {
+                    new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_POPULARITY);
+                } else {
+                    Toast.makeText(getContext(), R.string.string_network_unavail, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.sort_by_rating:
-                Log.d(this.toString(), "Sort by rating");
-                new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_RATING);
+                if(networkInfo != null && networkInfo.isConnected()) {
+                    new FetchDataTask(getContext()).execute(FetchDataTask.SORT_BY_RATING);
+                } else {
+                    Toast.makeText(getContext(), R.string.string_network_unavail, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return false;
@@ -172,9 +187,9 @@ public class MovieFragment extends Fragment {
                         .appendQueryParameter(PARAM_SORT_BY, params[0])
                         .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key));
                 //Vote count condition to get relevant results
-                        if(params[0].equals(SORT_BY_RATING)) {
-                            uriBuilder.appendQueryParameter("vote_count.gte", "500");
-                        }
+                if(params[0].equals(SORT_BY_RATING)) {
+                    uriBuilder.appendQueryParameter("vote_count.gte", "500");
+                }
 
                 Uri uri = uriBuilder.build();
                 URL url = new URL(uri.toString());
