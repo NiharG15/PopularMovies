@@ -119,6 +119,7 @@
             <TextView
                 android:id="@+id/overview"
                 android:layout_below="@id/poster"
+                android:paddingBottom="@dimen/std_vertical_margin"
                 android:layout_marginTop="@dimen/std_vertical_margin"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/font_size_std"
