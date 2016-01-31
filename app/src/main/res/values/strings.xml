@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
     <string name="content_desc_movie_poster">Movie Poster</string>
     <string name="string_sort_by">Sort By</string>
     <string name="string_popularity">Popularity</string>
@@ -12,4 +10,5 @@
     <string name="string_rating">Rating:</string>
     <string name="string_original_title">Original Title:</string>
     <string name="string_cd_backdrop">Backdrop</string>
+    <string name="string_cd_movie_poster">Movie Poster</string>
 </resources>

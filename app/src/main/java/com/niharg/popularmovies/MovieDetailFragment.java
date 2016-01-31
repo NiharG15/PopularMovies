@@ -71,7 +71,7 @@ public class MovieDetailFragment extends Fragment {
         title.setText(String.format("%s (%s)", mMovie.getTitle(), DateFormat.format("yyyy", date)));
         relDate.setText(DateFormat.format("MMMM dd, yyyy", date));
         overview.setText(mMovie.getDescription());
-        rating.setText(String.format("%2.1f / 10", Double.parseDouble(mMovie.getVoteAvg())));
+        rating.setText(String.format(Locale.US, "%2.1f / 10", Double.parseDouble(mMovie.getVoteAvg())));
         origTitle.setText(mMovie.getOrigTitle());
 
         return v;

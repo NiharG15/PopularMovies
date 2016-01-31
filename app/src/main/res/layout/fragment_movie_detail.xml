@@ -43,7 +43,8 @@
                 android:layout_marginTop="@dimen/std_vertical_margin"
                 android:layout_marginLeft="@dimen/std_horizontal_margin"
                 android:layout_below="@id/title"
-                tools:src="@mipmap/ic_launcher" />
+                tools:src="@mipmap/ic_launcher"
+                android:contentDescription="@string/string_cd_movie_poster" />
 
             <TextView
                 android:layout_marginLeft="@dimen/std_horizontal_margin"

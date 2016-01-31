@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Transition;
-import android.view.Menu;
 import android.view.MenuItem;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -38,11 +37,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance((Movie) getIntent().getExtras().getSerializable(ARG_MOVIE));
         getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_detail, movieDetailFragment, TAG_MD_FRAGMENT).commit();
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

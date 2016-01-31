@@ -164,6 +164,7 @@ public class MovieFragment extends Fragment {
                 if(inputStream == null) {
                     //Nothing to do
                     responseJson = null;
+                    return null;
                 }
 
                 reader = new BufferedReader(new InputStreamReader(inputStream));
