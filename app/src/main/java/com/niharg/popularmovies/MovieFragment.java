@@ -83,8 +83,8 @@ public class MovieFragment extends Fragment {
                     View toolbar = getActivity().findViewById(R.id.toolbar);
                     List<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                     pairs.add(Pair.create(toolbar, "toolbar"));
-                    pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
-                    pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
+                    if(statusBar != null) pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
+                    if(navigationBar != null) pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
                     pairs.add(Pair.create(view, "poster"));
                     ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), pairs.toArray(new Pair[pairs.size()]));
                     ActivityCompat.startActivity(getActivity(), i, optionsCompat.toBundle()); }
