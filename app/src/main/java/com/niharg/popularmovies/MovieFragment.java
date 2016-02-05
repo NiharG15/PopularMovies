@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,18 +26,23 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.niharg.popularmovies.model.DiscoverResults;
+import com.niharg.popularmovies.webservice.MovieService;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -149,9 +153,10 @@ public class MovieFragment extends Fragment {
         }
     }
 
-    public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
+    public class FetchDataTask extends AsyncTask<String, Void, List<Movie>> {
 
         public static final String TMDB_BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
+        public static final String TMDB_BASE_URL2 = "https://api.themoviedb.org/3/";
 
         public static final String PARAM_API_KEY = "api_key";
         public static final String PARAM_SORT_BY = "sort_by";
@@ -176,13 +181,28 @@ public class MovieFragment extends Fragment {
         }
 
         @Override
-        protected Movie[] doInBackground(String... params) {
+        protected List<Movie> doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
             String responseJson;
 
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(TMDB_BASE_URL2)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+
             try {
+                MovieService movieService = retrofit.create(MovieService.class);
+                Call<DiscoverResults> call = movieService.getPopularMovies(mContext.getString(R.string.tmdb_api_key), params[0], (params[0].equals(SORT_BY_RATING) ? "1000" : "0"));
+                Response<DiscoverResults> response = call.execute();
+                return response.body().getResults();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+/*            try {
                 Uri.Builder uriBuilder = Uri.parse(TMDB_BASE_URL).buildUpon()
                         .appendQueryParameter(PARAM_SORT_BY, params[0])
                         .appendQueryParameter(PARAM_API_KEY, mContext.getString(R.string.tmdb_api_key));
@@ -240,7 +260,7 @@ public class MovieFragment extends Fragment {
                 return parseJson(responseJson);
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             return null;
         }
@@ -266,7 +286,7 @@ public class MovieFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Movie[] movies) {
+        protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
             mAdapter.clear();
             for(Movie m: movies) {

@@ -1,5 +1,7 @@
 package com.niharg.popularmovies;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
@@ -7,13 +9,21 @@ import java.io.Serializable;
  */
 public class Movie implements Serializable {
 
+    @SerializedName("title")
     private String title;
+    @SerializedName("overview")
     private String description;
+    @SerializedName("poster_path")
     private String posterPath;
+    @SerializedName("release_date")
     private String relDate;
+    @SerializedName("id")
     private long id;
+    @SerializedName("original_title")
     private String origTitle;
+    @SerializedName("backdrop_path")
     private String backdropPath;
+    @SerializedName("vote_average")
     private String voteAvg;
 
     public Movie() {}
