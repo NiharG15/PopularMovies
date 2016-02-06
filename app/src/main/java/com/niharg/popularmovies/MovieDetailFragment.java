@@ -145,6 +145,13 @@ public class MovieDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(final List<Video> videos) {
             super.onPostExecute(videos);
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YT_VIDEO_BASE + videos.get((Integer) v.getTag()).getKey()));
+                    startActivity(i);
+                }
+            };
             for(int i = 0; i < videos.size(); i++) {
                 //If we have more than two trailers, add more image views.
                 if(i >= 2) {
@@ -154,13 +161,7 @@ public class MovieDetailFragment extends Fragment {
                 }
                 Picasso.with(mContext).load(Uri.parse(String.format(YT_THUMB_BASE, videos.get(i).getKey()))).into((ImageView) trailerView.getChildAt(i));
                 trailerView.getChildAt(i).setTag(i);
-                trailerView.getChildAt(i).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YT_VIDEO_BASE + videos.get((Integer) v.getTag()).getKey()));
-                        startActivity(i);
-                    }
-                });
+                trailerView.getChildAt(i).setOnClickListener(onClickListener);
             }
 
             //If we have only 1 trailer, disable the second ImageView.
