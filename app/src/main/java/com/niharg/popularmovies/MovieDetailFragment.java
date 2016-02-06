@@ -244,7 +244,7 @@ public class MovieDetailFragment extends Fragment {
                     v.setBackgroundResource(outValue.resourceId);
                     reviewView.addView(v);
                 }
-                String s1 = (reviews.get(i).getContent().length() > 200 ? reviews.get(i).getContent().substring(0, 400) : reviews.get(i).getContent());
+                String s1 = (reviews.get(i).getContent().length() > 400 ? reviews.get(i).getContent().substring(0, 400) : reviews.get(i).getContent());
                 ((TextView) reviewView.getChildAt(i)).setText(String.format(mContext.getString(R.string.string_review_format), reviews.get(i).getAuthor(), s1));
                 reviewView.getChildAt(i).setTag(i);
                 reviewView.getChildAt(i).setOnClickListener(onClickListener);
