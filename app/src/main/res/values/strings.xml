@@ -14,4 +14,7 @@
     <string name="string_network_unavail">Failed to update. Network unavailable.</string>
     <string name="string_cd_trailer">Trailer</string>
     <string name="string_trailers">Trailers and Clips:</string>
+    <string name="string_reviews">Reviews:</string>
+    <string name="string_review_format" formatted="false">Author: %s \n\n%s…\n\n(Click to view rest)</string>
+    <string name="string_no_reviews">No reviews yet.</string>
 </resources>

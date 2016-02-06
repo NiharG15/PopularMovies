@@ -7,7 +7,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.niharg.popularmovies.model.Review;
+import com.niharg.popularmovies.model.ReviewResults;
 import com.niharg.popularmovies.model.Video;
 import com.niharg.popularmovies.model.VideoResults;
 import com.niharg.popularmovies.webservice.MovieService;
@@ -47,6 +51,7 @@ public class MovieDetailFragment extends Fragment {
     private TextView rating;
     private TextView origTitle;
     private LinearLayout trailerView;
+    private LinearLayout reviewView;
 
     private Movie mMovie;
 
@@ -86,6 +91,7 @@ public class MovieDetailFragment extends Fragment {
         rating = (TextView) v.findViewById(R.id.rating);
         origTitle = (TextView) v.findViewById(R.id.originalTitle);
         trailerView = (LinearLayout) v.findViewById(R.id.trailerView);
+        reviewView = (LinearLayout) v.findViewById(R.id.reviewView);
 
         Picasso.with(getContext()).load(MovieGridAdapter.TMDB_IMAGE_BASE_URL + mMovie.getPosterPath()).into(poster);
         Picasso.with(getContext()).load(TMDB_BACKDROP_BASE_URL + mMovie.getBackdropPath()).into(backdrop);
@@ -105,6 +111,12 @@ public class MovieDetailFragment extends Fragment {
          */
 
         new FetchVideoTask(getContext()).execute(mMovie.getId());
+
+        /*
+            Reviews
+         */
+
+        new FetchReviewTask(getContext()).execute(mMovie.getId());
 
         return v;
     }
@@ -145,6 +157,7 @@ public class MovieDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(final List<Video> videos) {
             super.onPostExecute(videos);
+
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -152,6 +165,7 @@ public class MovieDetailFragment extends Fragment {
                     startActivity(i);
                 }
             };
+
             for(int i = 0; i < videos.size(); i++) {
                 //If we have more than two trailers, add more image views.
                 if(i >= 2) {
@@ -167,6 +181,73 @@ public class MovieDetailFragment extends Fragment {
             //If we have only 1 trailer, disable the second ImageView.
             if(videos.size() < 2) {
                 trailerView.getChildAt(1).setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public class FetchReviewTask extends AsyncTask<Long, Void, List<Review>> {
+
+        private Context mContext;
+
+        public FetchReviewTask(Context mContext) {
+            this.mContext = mContext;
+        }
+
+        @Override
+        protected List<Review> doInBackground(Long... params) {
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(MovieFragment.FetchDataTask.TMDB_BASE_URL2)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            MovieService movieService = retrofit.create(MovieService.class);
+
+            Call<ReviewResults> call = movieService.getReviewsForMovie(mMovie.getId(), mContext.getString(R.string.tmdb_api_key));
+
+            try {
+                Response<ReviewResults> response = call.execute();
+                return response.body().getResults();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final List<Review> reviews) {
+            super.onPostExecute(reviews);
+
+            if(reviews.size() == 0) {
+                ((TextView) reviewView.getChildAt(0)).setText(R.string.string_no_reviews);
+                return;
+            }
+
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(reviews.get((Integer) v.getTag()).getUrl()));
+                    startActivity(i);
+                }
+            };
+
+            for(int i = 0; i < reviews.size(); i++) {
+                if(i >= 1) {
+                    TextView v = new TextView(mContext);
+                    v.setLayoutParams(reviewView.getChildAt(0).getLayoutParams());
+                    v.setTextColor(mContext.getResources().getColor(android.R.color.white));
+                    v.setMaxLines(20);
+                    v.setEllipsize(TextUtils.TruncateAt.END);
+                    TypedValue outValue = new TypedValue();
+                    mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
+                    v.setBackgroundResource(outValue.resourceId);
+                    reviewView.addView(v);
+                }
+                String s1 = (reviews.get(i).getContent().length() > 200 ? reviews.get(i).getContent().substring(0, 400) : reviews.get(i).getContent());
+                ((TextView) reviewView.getChildAt(i)).setText(String.format(mContext.getString(R.string.string_review_format), reviews.get(i).getAuthor(), s1));
+                reviewView.getChildAt(i).setTag(i);
+                reviewView.getChildAt(i).setOnClickListener(onClickListener);
             }
         }
     }

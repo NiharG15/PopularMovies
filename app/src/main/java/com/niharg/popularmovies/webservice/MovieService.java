@@ -1,6 +1,7 @@
 package com.niharg.popularmovies.webservice;
 
 import com.niharg.popularmovies.model.DiscoverResults;
+import com.niharg.popularmovies.model.ReviewResults;
 import com.niharg.popularmovies.model.VideoResults;
 
 import retrofit2.Call;
@@ -18,4 +19,7 @@ public interface MovieService {
 
     @GET("movie/{id}/videos")
     Call<VideoResults> getVideosForMovie(@Path("id") long id, @Query("api_key") String apiKey);
+
+    @GET("movie/{id}/reviews")
+    Call<ReviewResults> getReviewsForMovie(@Path("id") long id, @Query("api_key") String apiKey);
 }
