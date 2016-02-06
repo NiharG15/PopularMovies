@@ -127,6 +127,49 @@
                 android:layout_marginRight="@dimen/std_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/trailerTitle"
+                android:layout_below="@id/overview"
+                android:text="@string/string_trailers"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/font_size_std_l"
+                android:layout_width="match_parent" />
+
+            <HorizontalScrollView
+                android:layout_marginLeft="@dimen/std_horizontal_margin"
+                android:layout_marginRight="@dimen/std_horizontal_margin"
+                android:layout_marginTop="@dimen/std_vertical_margin"
+                android:layout_marginBottom="@dimen/std_vertical_margin"
+                android:layout_below="@id/trailerTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/trailerView"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        tools:src="@mipmap/ic_launcher"
+                        android:layout_width="170dp"
+                        android:scaleType="fitCenter"
+                        android:layout_height="128dp"
+                        android:layout_marginEnd="@dimen/std_horizontal_margin"
+                        android:contentDescription="@string/string_cd_trailer" />
+                    <ImageView
+                        tools:src="@mipmap/ic_launcher"
+                        android:layout_width="170dp"
+                        android:scaleType="fitCenter"
+                        android:layout_height="128dp"
+                        android:layout_marginEnd="@dimen/std_horizontal_margin"
+                        android:contentDescription="@string/string_cd_trailer" />
+                </LinearLayout>
+
+            </HorizontalScrollView>
         </RelativeLayout>
 
     </ScrollView>

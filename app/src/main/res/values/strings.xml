@@ -12,4 +12,6 @@
     <string name="string_cd_backdrop">Backdrop</string>
     <string name="string_cd_movie_poster">Movie Poster</string>
     <string name="string_network_unavail">Failed to update. Network unavailable.</string>
+    <string name="string_cd_trailer">Trailer</string>
+    <string name="string_trailers">Trailers:</string>
 </resources>

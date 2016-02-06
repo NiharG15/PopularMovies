@@ -8,5 +8,6 @@
     <dimen name="std_vertical_margin">16dp</dimen>
 
     <dimen name="font_size_std">16sp</dimen>
+    <dimen name="font_size_std_l">18sp</dimen>
     <dimen name="font_size_large">24sp</dimen>
 </resources>

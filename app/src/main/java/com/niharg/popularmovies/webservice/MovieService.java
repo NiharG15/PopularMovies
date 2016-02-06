@@ -17,5 +17,5 @@ public interface MovieService {
     Call<DiscoverResults> getPopularMovies(@Query("api_key") String apiKey, @Query("sort_by") String sortBy, @Query("vote_count.gte") String minVotes);
 
     @GET("movie/{id}/videos")
-    Call<VideoResults> getVideosForMovie(@Query("api_key") String apiKey, @Path("id") int id);
+    Call<VideoResults> getVideosForMovie(@Path("id") long id, @Query("api_key") String apiKey);
 }
