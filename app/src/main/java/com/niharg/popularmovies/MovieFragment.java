@@ -4,6 +4,8 @@ package com.niharg.popularmovies;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -26,7 +28,10 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.niharg.popularmovies.database.DatabaseContract;
+import com.niharg.popularmovies.database.MovieDbHelper;
 import com.niharg.popularmovies.model.DiscoverResults;
+import com.niharg.popularmovies.model.Movie;
 import com.niharg.popularmovies.webservice.MovieService;
 
 import org.json.JSONArray;
@@ -36,6 +41,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,6 +131,9 @@ public class MovieFragment extends Fragment {
                     Toast.makeText(getContext(), R.string.string_network_unavail, Toast.LENGTH_SHORT).show();
                 }
                 return true;
+            case R.id.favoritesOnly:
+                new DbReader(getContext()).execute();
+                return  true;
             default:
                 return false;
         }
@@ -176,6 +185,8 @@ public class MovieFragment extends Fragment {
 
         private Context mContext;
 
+        boolean networkError = false;
+
         FetchDataTask(Context context) {
             mContext = context;
         }
@@ -201,6 +212,9 @@ public class MovieFragment extends Fragment {
                 return response.body().getResults();
             } catch (IOException e) {
                 e.printStackTrace();
+                if(e instanceof UnknownHostException) {
+                    networkError = true;
+                }
             }
 /*            try {
                 Uri.Builder uriBuilder = Uri.parse(TMDB_BASE_URL).buildUpon()
@@ -270,7 +284,7 @@ public class MovieFragment extends Fragment {
             JSONArray results = dataObj.getJSONArray("results");
             Movie[] data = new Movie[results.length()];
 
-            for(int i = 0; i < results.length(); i++) {
+            for (int i = 0; i < results.length(); i++) {
                 JSONObject temp = results.getJSONObject(i);
                 data[i] = new Movie(temp.getString(KEY_TITLE),
                         temp.getString(KEY_DESC),
@@ -288,11 +302,79 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
-            mAdapter.clear();
-            for(Movie m: movies) {
-                mAdapter.add(m);
+            if (movies != null) {
+                mAdapter.clear();
+                mAdapter.addAll(movies);
+                mAdapter.notifyDataSetChanged();
+            } else {
+                if(networkError) {
+                    Toast.makeText(mContext, "Network error", Toast.LENGTH_SHORT).show();
+                }
             }
-            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public class DbReader extends AsyncTask<Void, Void, List<Movie>> {
+
+        private Context mContext;
+
+        public DbReader(Context mContext) {
+            this.mContext = mContext;
+        }
+
+        @Override
+        protected List<Movie> doInBackground(Void... params) {
+
+            MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            List<Movie> movieList = new ArrayList<>();
+
+            Cursor c = db.query(DatabaseContract.MovieEntry.TABLE_NAME, null, null, null, null, null, null);
+            int colTmdbId = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TMDB_ID);
+            int colTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TITLE);
+            int colDesc = c.getColumnIndex(DatabaseContract.MovieEntry.COL_DESC);
+            int colPoster = c.getColumnIndex(DatabaseContract.MovieEntry.COL_POSTER_PATH);
+            int colRelDate = c.getColumnIndex(DatabaseContract.MovieEntry.COL_REL_DATE);
+            int colOgTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_ORIGINAL_TITLE);
+            int colBackdrop = c.getColumnIndex(DatabaseContract.MovieEntry.COL_BACKDROP_PATH);
+            int colVoteAvg = c.getColumnIndex(DatabaseContract.MovieEntry.COL_VOTE_AVG);
+
+            c.moveToFirst();
+            movieList.add(new Movie(c.getString(colTitle),
+                    c.getString(colDesc),
+                    c.getString(colPoster),
+                    c.getString(colRelDate),
+                    c.getLong(colTmdbId),
+                    c.getString(colOgTitle),
+                    c.getString(colBackdrop),
+                    c.getString(colVoteAvg)));
+
+            while(c.moveToNext()) {
+                movieList.add(new Movie(c.getString(colTitle),
+                        c.getString(colDesc),
+                        c.getString(colPoster),
+                        c.getString(colRelDate),
+                        c.getLong(colTmdbId),
+                        c.getString(colOgTitle),
+                        c.getString(colBackdrop),
+                        c.getString(colVoteAvg)));
+            }
+
+            c.close();
+            db.close();
+
+            return movieList;
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+            super.onPostExecute(movies);
+            if(movies != null) {
+                mAdapter.clear();
+                mAdapter.addAll(movies);
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
 

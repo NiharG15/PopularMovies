@@ -15,6 +15,10 @@
             <item
                 android:id="@+id/sort_by_rating"
                 android:title="@string/string_highest_rated" />
+
+            <item
+                android:id="@+id/favoritesOnly"
+                android:title="@string/string_menu_favorites_only" />
         </menu>
     </item>
 </menu>

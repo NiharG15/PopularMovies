@@ -17,4 +17,6 @@
     <string name="string_reviews">Reviews:</string>
     <string name="string_review_format" formatted="false">Author: %s \n\n%s…\n\n(Click to view rest)</string>
     <string name="string_no_reviews">No reviews yet.</string>
+    <string name="string_favorite">Favorite</string>
+    <string name="string_menu_favorites_only">Favorites Only</string>
 </resources>

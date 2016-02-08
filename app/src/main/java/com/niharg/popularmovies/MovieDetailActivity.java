@@ -9,6 +9,8 @@ import android.transition.Fade;
 import android.transition.Transition;
 import android.view.MenuItem;
 
+import com.niharg.popularmovies.model.Movie;
+
 public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String ARG_MOVIE = "movie";

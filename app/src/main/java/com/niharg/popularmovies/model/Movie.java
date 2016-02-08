@@ -1,4 +1,4 @@
-package com.niharg.popularmovies;
+package com.niharg.popularmovies.model;
 
 import com.google.gson.annotations.SerializedName;
 

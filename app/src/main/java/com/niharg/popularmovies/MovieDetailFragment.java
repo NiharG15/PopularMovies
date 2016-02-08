@@ -1,7 +1,10 @@
 package com.niharg.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -9,14 +12,21 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.niharg.popularmovies.database.DatabaseContract;
+import com.niharg.popularmovies.database.MovieDbHelper;
+import com.niharg.popularmovies.model.Movie;
 import com.niharg.popularmovies.model.Review;
 import com.niharg.popularmovies.model.ReviewResults;
 import com.niharg.popularmovies.model.Video;
@@ -42,6 +52,7 @@ public class MovieDetailFragment extends Fragment {
     private static final String ARG_MOVIE = "movie";
     public static final String TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780";
 
+    private MenuItem star;
 
     private ImageView poster;
     private ImageView backdrop;
@@ -55,6 +66,7 @@ public class MovieDetailFragment extends Fragment {
 
     private Movie mMovie;
 
+    private boolean favorite = false;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -79,6 +91,9 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true);
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
@@ -118,7 +133,67 @@ public class MovieDetailFragment extends Fragment {
 
         new FetchReviewTask(getContext()).execute(mMovie.getId());
 
+        MovieDbHelper dbHelper = new MovieDbHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor c = db.query(DatabaseContract.MovieEntry.TABLE_NAME, new String[]{DatabaseContract.MovieEntry.COL_TMDB_ID}, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())}, null, null, null);
+
+        if(c.moveToFirst()) {
+            favorite = true;
+        }
+
+        c.close();
+        db.close();
+
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_movie_detail, menu);
+        star = menu.findItem(R.id.favorite);
+        if(favorite) {
+            if(star != null) {
+                star.setIcon(R.drawable.ic_star_white_24dp);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        if(item.getItemId() == R.id.favorite) {
+            item.setIcon(R.drawable.ic_star_white_24dp);
+            MovieDbHelper dbHelper = new MovieDbHelper(getContext());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            if(!favorite) {
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(DatabaseContract.MovieEntry.COL_TMDB_ID, mMovie.getId());
+                contentValues.put(DatabaseContract.MovieEntry.COL_TITLE, mMovie.getTitle());
+                contentValues.put(DatabaseContract.MovieEntry.COL_DESC, mMovie.getDescription());
+                contentValues.put(DatabaseContract.MovieEntry.COL_POSTER_PATH, mMovie.getPosterPath());
+                contentValues.put(DatabaseContract.MovieEntry.COL_REL_DATE, mMovie.getRelDate());
+                contentValues.put(DatabaseContract.MovieEntry.COL_ORIGINAL_TITLE, mMovie.getOrigTitle());
+                contentValues.put(DatabaseContract.MovieEntry.COL_BACKDROP_PATH, mMovie.getBackdropPath());
+                contentValues.put(DatabaseContract.MovieEntry.COL_VOTE_AVG, mMovie.getVoteAvg());
+
+                long res = db.insert(DatabaseContract.MovieEntry.TABLE_NAME, null, contentValues);
+                Log.d("Row inserted: ", Long.toString(res));
+                favorite = true;
+            } else {
+                favorite = false;
+                item.setIcon(R.drawable.ic_star_border_white_24dp);
+                int n = db.delete(DatabaseContract.MovieEntry.TABLE_NAME, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())});
+                Log.d("Rows deleted: ", Integer.toString(n));
+            }
+            db.close();
+            return true;
+        }
+
+        return false;
     }
 
     private class FetchVideoTask extends AsyncTask<Long, Void, List<Video>> {

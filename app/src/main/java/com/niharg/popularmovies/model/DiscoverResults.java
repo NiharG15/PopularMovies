@@ -1,7 +1,6 @@
 package com.niharg.popularmovies.model;
 
 import com.google.gson.annotations.SerializedName;
-import com.niharg.popularmovies.Movie;
 
 import java.util.List;
 
