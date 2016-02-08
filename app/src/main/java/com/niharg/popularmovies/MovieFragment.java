@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -340,15 +341,16 @@ public class MovieFragment extends Fragment {
             int colBackdrop = c.getColumnIndex(DatabaseContract.MovieEntry.COL_BACKDROP_PATH);
             int colVoteAvg = c.getColumnIndex(DatabaseContract.MovieEntry.COL_VOTE_AVG);
 
-            c.moveToFirst();
-            movieList.add(new Movie(c.getString(colTitle),
-                    c.getString(colDesc),
-                    c.getString(colPoster),
-                    c.getString(colRelDate),
-                    c.getLong(colTmdbId),
-                    c.getString(colOgTitle),
-                    c.getString(colBackdrop),
-                    c.getString(colVoteAvg)));
+            if(c.moveToFirst()) {
+                movieList.add(new Movie(c.getString(colTitle),
+                        c.getString(colDesc),
+                        c.getString(colPoster),
+                        c.getString(colRelDate),
+                        c.getLong(colTmdbId),
+                        c.getString(colOgTitle),
+                        c.getString(colBackdrop),
+                        c.getString(colVoteAvg)));
+            }
 
             while(c.moveToNext()) {
                 movieList.add(new Movie(c.getString(colTitle),
@@ -370,10 +372,19 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
-            if(movies != null) {
+            if(movies != null && !movies.isEmpty()) {
                 mAdapter.clear();
                 mAdapter.addAll(movies);
                 mAdapter.notifyDataSetChanged();
+            } else {
+                final Snackbar s = Snackbar.make(MovieFragment.this.mMovieGrid, R.string.string_no_favorites, Snackbar.LENGTH_INDEFINITE);
+                    s.setAction("Dismiss", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        s.dismiss();
+                    }
+                });
+                s.show();
             }
         }
     }

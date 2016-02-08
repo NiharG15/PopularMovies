@@ -19,4 +19,5 @@
     <string name="string_no_reviews">No reviews yet.</string>
     <string name="string_favorite">Favorite</string>
     <string name="string_menu_favorites_only">Favorites Only</string>
+    <string name="string_no_favorites">No favorites.</string>
 </resources>
