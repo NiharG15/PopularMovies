@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 'Google Inc.:Google APIs:23'
@@ -29,4 +30,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     compile 'com.google.code.gson:gson:2.5'
+    apt 'net.simonvt.schematic:schematic-compiler:0.6.4'
+    compile 'net.simonvt.schematic:schematic:0.6.4'
 }
