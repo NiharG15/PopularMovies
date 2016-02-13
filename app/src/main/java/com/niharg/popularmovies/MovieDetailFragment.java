@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -64,6 +67,8 @@ public class MovieDetailFragment extends Fragment {
     private LinearLayout trailerView;
     private LinearLayout reviewView;
 
+    private View mParent;
+
     private Movie mMovie;
 
     private boolean favorite = false;
@@ -96,7 +101,7 @@ public class MovieDetailFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-
+        mParent = v;
 
         poster = (ImageView) v.findViewById(R.id.poster);
         backdrop = (ImageView) v.findViewById(R.id.backdrop);
@@ -121,17 +126,31 @@ public class MovieDetailFragment extends Fragment {
         rating.setText(String.format(Locale.US, "%2.1f / 10", Double.parseDouble(mMovie.getVoteAvg())));
         origTitle.setText(mMovie.getOrigTitle());
 
+
+
+        NetworkInfo networkInfo = ((ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnected()) {
+
+
         /*
             Trailers
-         */
-
-        new FetchVideoTask(getContext()).execute(mMovie.getId());
+        */
+            new FetchVideoTask(getContext()).execute(mMovie.getId());
 
         /*
             Reviews
-         */
+        */
 
-        new FetchReviewTask(getContext()).execute(mMovie.getId());
+            new FetchReviewTask(getContext()).execute(mMovie.getId());
+
+        } else {
+            Snackbar.make(container, "Offline Mode", Snackbar.LENGTH_LONG).show();
+            reviewView.setVisibility(View.GONE);
+            trailerView.setVisibility(View.GONE);
+            v.findViewById(R.id.trailerTitle).setVisibility(View.GONE);
+            v.findViewById(R.id.reviewTitle).setVisibility(View.GONE);
+        }
 
         MovieDbHelper dbHelper = new MovieDbHelper(getContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -208,6 +227,8 @@ public class MovieDetailFragment extends Fragment {
             this.mContext = mContext;
         }
 
+        boolean networkError = false;
+
         @Override
         protected List<Video> doInBackground(Long... params) {
 
@@ -224,6 +245,7 @@ public class MovieDetailFragment extends Fragment {
                 return response.body().getVideos();
             } catch (IOException e) {
                 e.printStackTrace();
+                networkError = true;
             }
 
             return null;
@@ -233,29 +255,35 @@ public class MovieDetailFragment extends Fragment {
         protected void onPostExecute(final List<Video> videos) {
             super.onPostExecute(videos);
 
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YT_VIDEO_BASE + videos.get((Integer) v.getTag()).getKey()));
-                    startActivity(i);
-                }
-            };
+            if (videos != null && videos.size() != 0) {
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YT_VIDEO_BASE + videos.get((Integer) v.getTag()).getKey()));
+                        startActivity(i);
+                    }
+                };
 
-            for(int i = 0; i < videos.size(); i++) {
-                //If we have more than two trailers, add more image views.
-                if(i >= 2) {
-                    ImageView imageView = new ImageView(mContext);
-                    imageView.setLayoutParams(trailerView.getChildAt(0).getLayoutParams());
-                    trailerView.addView(imageView);
+                for(int i = 0; i < videos.size(); i++) {
+                    //If we have more than two trailers, add more image views.
+                    if(i >= 2) {
+                        ImageView imageView = new ImageView(mContext);
+                        imageView.setLayoutParams(trailerView.getChildAt(0).getLayoutParams());
+                        trailerView.addView(imageView);
+                    }
+                    Picasso.with(mContext).load(Uri.parse(String.format(YT_THUMB_BASE, videos.get(i).getKey()))).into((ImageView) trailerView.getChildAt(i));
+                    trailerView.getChildAt(i).setTag(i);
+                    trailerView.getChildAt(i).setOnClickListener(onClickListener);
                 }
-                Picasso.with(mContext).load(Uri.parse(String.format(YT_THUMB_BASE, videos.get(i).getKey()))).into((ImageView) trailerView.getChildAt(i));
-                trailerView.getChildAt(i).setTag(i);
-                trailerView.getChildAt(i).setOnClickListener(onClickListener);
-            }
 
-            //If we have only 1 trailer, disable the second ImageView.
-            if(videos.size() < 2) {
-                trailerView.getChildAt(1).setVisibility(View.GONE);
+                //If we have only 1 trailer, disable the second ImageView.
+                if(videos.size() < 2) {
+                    trailerView.getChildAt(1).setVisibility(View.GONE);
+                }
+            } else {
+                if(networkError) {
+                    Snackbar.make(mParent, "Network Error", Snackbar.LENGTH_INDEFINITE).show();
+                }
             }
         }
     }
@@ -263,6 +291,7 @@ public class MovieDetailFragment extends Fragment {
     public class FetchReviewTask extends AsyncTask<Long, Void, List<Review>> {
 
         private Context mContext;
+        private boolean networkError = false;
 
         public FetchReviewTask(Context mContext) {
             this.mContext = mContext;
@@ -285,6 +314,7 @@ public class MovieDetailFragment extends Fragment {
                 return response.body().getResults();
             } catch (IOException e) {
                 e.printStackTrace();
+                networkError = true;
             }
 
             return null;
@@ -294,35 +324,43 @@ public class MovieDetailFragment extends Fragment {
         protected void onPostExecute(final List<Review> reviews) {
             super.onPostExecute(reviews);
 
-            if(reviews.size() == 0) {
-                ((TextView) reviewView.getChildAt(0)).setText(R.string.string_no_reviews);
-                return;
-            }
-
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(reviews.get((Integer) v.getTag()).getUrl()));
-                    startActivity(i);
+            if (reviews != null) {
+                if(reviews.size() == 0) {
+                    ((TextView) reviewView.getChildAt(0)).setText(R.string.string_no_reviews);
+                    return;
                 }
-            };
 
-            for(int i = 0; i < reviews.size(); i++) {
-                if(i >= 1) {
-                    TextView v = new TextView(mContext);
-                    v.setLayoutParams(reviewView.getChildAt(0).getLayoutParams());
-                    v.setTextColor(mContext.getResources().getColor(android.R.color.white));
-                    v.setMaxLines(20);
-                    v.setEllipsize(TextUtils.TruncateAt.END);
-                    TypedValue outValue = new TypedValue();
-                    mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
-                    v.setBackgroundResource(outValue.resourceId);
-                    reviewView.addView(v);
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(reviews.get((Integer) v.getTag()).getUrl()));
+                        startActivity(i);
+                    }
+                };
+
+                for(int i = 0; i < reviews.size(); i++) {
+                    if(i >= 1) {
+                        TextView v = new TextView(mContext);
+                        v.setLayoutParams(reviewView.getChildAt(0).getLayoutParams());
+                        v.setTextColor(mContext.getResources().getColor(android.R.color.white));
+                        v.setMaxLines(20);
+                        v.setEllipsize(TextUtils.TruncateAt.END);
+                        TypedValue outValue = new TypedValue();
+                        mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
+                        v.setBackgroundResource(outValue.resourceId);
+                        reviewView.addView(v);
+                    }
+                    String s1 = (reviews.get(i).getContent().length() > 400 ? reviews.get(i).getContent().substring(0, 400) : reviews.get(i).getContent());
+                    ((TextView) reviewView.getChildAt(i)).setText(String.format(mContext.getString(R.string.string_review_format), reviews.get(i).getAuthor(), s1));
+                    reviewView.getChildAt(i).setTag(i);
+                    reviewView.getChildAt(i).setOnClickListener(onClickListener);
                 }
-                String s1 = (reviews.get(i).getContent().length() > 400 ? reviews.get(i).getContent().substring(0, 400) : reviews.get(i).getContent());
-                ((TextView) reviewView.getChildAt(i)).setText(String.format(mContext.getString(R.string.string_review_format), reviews.get(i).getAuthor(), s1));
-                reviewView.getChildAt(i).setTag(i);
-                reviewView.getChildAt(i).setOnClickListener(onClickListener);
+            } else {
+                if(networkError) {
+                    ((TextView) reviewView.getChildAt(0)).setText(R.string.string_review_network_error);
+                } else {
+                    ((TextView) reviewView.getChildAt(0)).setText(R.string.string_no_reviews);
+                }
             }
         }
     }
