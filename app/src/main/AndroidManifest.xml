@@ -28,6 +28,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
             </activity>
+
+        <provider
+            android:authorities="com.niharg.popularmovies"
+            android:name="com.niharg.popularmovies.database.generated.FavoritesProvider"
+            android:exported="false" />
+
     </application>
+
 
 </manifest>

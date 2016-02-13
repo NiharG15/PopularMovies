@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.niharg.popularmovies.database.DatabaseContract;
-import com.niharg.popularmovies.database.MovieDbHelper;
+import com.niharg.popularmovies.database.FavoritesProvider;
 import com.niharg.popularmovies.model.Movie;
 import com.niharg.popularmovies.model.Review;
 import com.niharg.popularmovies.model.ReviewResults;
@@ -152,17 +151,14 @@ public class MovieDetailFragment extends Fragment {
             v.findViewById(R.id.reviewTitle).setVisibility(View.GONE);
         }
 
-        MovieDbHelper dbHelper = new MovieDbHelper(getContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query(DatabaseContract.MovieEntry.TABLE_NAME, new String[]{DatabaseContract.MovieEntry.COL_TMDB_ID}, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())}, null, null, null);
+        Cursor c = getContext().getContentResolver().query(FavoritesProvider.Movies.CONTENT_URI, new String[]{DatabaseContract.MovieEntry.COL_TMDB_ID}, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())}, null);
 
-        if(c.moveToFirst()) {
+        if(c != null && c.moveToFirst()) {
             favorite = true;
         }
 
-        c.close();
-        db.close();
+        if(c != null) c.close();
 
         return v;
     }
@@ -184,8 +180,8 @@ public class MovieDetailFragment extends Fragment {
         super.onOptionsItemSelected(item);
         if(item.getItemId() == R.id.favorite) {
             item.setIcon(R.drawable.ic_star_white_24dp);
-            MovieDbHelper dbHelper = new MovieDbHelper(getContext());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
+           // MovieDbHelper dbHelper = new MovieDbHelper(getContext());
+           // SQLiteDatabase db = dbHelper.getWritableDatabase();
 
             if(!favorite) {
 
@@ -199,16 +195,21 @@ public class MovieDetailFragment extends Fragment {
                 contentValues.put(DatabaseContract.MovieEntry.COL_BACKDROP_PATH, mMovie.getBackdropPath());
                 contentValues.put(DatabaseContract.MovieEntry.COL_VOTE_AVG, mMovie.getVoteAvg());
 
-                long res = db.insert(DatabaseContract.MovieEntry.TABLE_NAME, null, contentValues);
-                Log.d("Row inserted: ", Long.toString(res));
+//                long res = db.insert(DatabaseContract.MovieEntry.TABLE_NAME, null, contentValues);
+
+                Uri u = getContext().getContentResolver().insert(FavoritesProvider.Movies.CONTENT_URI, contentValues);
+
+                if(u != null)
+                Log.d("Row inserted: ", u.toString());
+
                 favorite = true;
             } else {
                 favorite = false;
                 item.setIcon(R.drawable.ic_star_border_white_24dp);
-                int n = db.delete(DatabaseContract.MovieEntry.TABLE_NAME, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())});
+                int n = getContext().getContentResolver().delete(FavoritesProvider.Movies.CONTENT_URI, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())});
                 Log.d("Rows deleted: ", Integer.toString(n));
             }
-            db.close();
+            //db.close();
             return true;
         }
 

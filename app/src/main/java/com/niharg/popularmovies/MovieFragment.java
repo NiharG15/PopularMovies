@@ -30,6 +30,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.niharg.popularmovies.database.DatabaseContract;
+import com.niharg.popularmovies.database.FavoritesProvider;
 import com.niharg.popularmovies.database.MovieDbHelper;
 import com.niharg.popularmovies.model.DiscoverResults;
 import com.niharg.popularmovies.model.Movie;
@@ -331,39 +332,44 @@ public class MovieFragment extends Fragment {
 
             List<Movie> movieList = new ArrayList<>();
 
-            Cursor c = db.query(DatabaseContract.MovieEntry.TABLE_NAME, null, null, null, null, null, null);
-            int colTmdbId = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TMDB_ID);
-            int colTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TITLE);
-            int colDesc = c.getColumnIndex(DatabaseContract.MovieEntry.COL_DESC);
-            int colPoster = c.getColumnIndex(DatabaseContract.MovieEntry.COL_POSTER_PATH);
-            int colRelDate = c.getColumnIndex(DatabaseContract.MovieEntry.COL_REL_DATE);
-            int colOgTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_ORIGINAL_TITLE);
-            int colBackdrop = c.getColumnIndex(DatabaseContract.MovieEntry.COL_BACKDROP_PATH);
-            int colVoteAvg = c.getColumnIndex(DatabaseContract.MovieEntry.COL_VOTE_AVG);
+//            Cursor c = db.query(DatabaseContract.MovieEntry.TABLE_NAME, null, null, null, null, null, null);
 
-            if(c.moveToFirst()) {
-                movieList.add(new Movie(c.getString(colTitle),
-                        c.getString(colDesc),
-                        c.getString(colPoster),
-                        c.getString(colRelDate),
-                        c.getLong(colTmdbId),
-                        c.getString(colOgTitle),
-                        c.getString(colBackdrop),
-                        c.getString(colVoteAvg)));
+            Cursor c = mContext.getContentResolver().query(FavoritesProvider.Movies.CONTENT_URI, null, null, null, null);
+
+            if (c != null) {
+                int colTmdbId = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TMDB_ID);
+                int colTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_TITLE);
+                int colDesc = c.getColumnIndex(DatabaseContract.MovieEntry.COL_DESC);
+                int colPoster = c.getColumnIndex(DatabaseContract.MovieEntry.COL_POSTER_PATH);
+                int colRelDate = c.getColumnIndex(DatabaseContract.MovieEntry.COL_REL_DATE);
+                int colOgTitle = c.getColumnIndex(DatabaseContract.MovieEntry.COL_ORIGINAL_TITLE);
+                int colBackdrop = c.getColumnIndex(DatabaseContract.MovieEntry.COL_BACKDROP_PATH);
+                int colVoteAvg = c.getColumnIndex(DatabaseContract.MovieEntry.COL_VOTE_AVG);
+
+                if(c.moveToFirst()) {
+                    movieList.add(new Movie(c.getString(colTitle),
+                            c.getString(colDesc),
+                            c.getString(colPoster),
+                            c.getString(colRelDate),
+                            c.getLong(colTmdbId),
+                            c.getString(colOgTitle),
+                            c.getString(colBackdrop),
+                            c.getString(colVoteAvg)));
+                }
+
+                while(c.moveToNext()) {
+                    movieList.add(new Movie(c.getString(colTitle),
+                            c.getString(colDesc),
+                            c.getString(colPoster),
+                            c.getString(colRelDate),
+                            c.getLong(colTmdbId),
+                            c.getString(colOgTitle),
+                            c.getString(colBackdrop),
+                            c.getString(colVoteAvg)));
+                }
+
+                c.close();
             }
-
-            while(c.moveToNext()) {
-                movieList.add(new Movie(c.getString(colTitle),
-                        c.getString(colDesc),
-                        c.getString(colPoster),
-                        c.getString(colRelDate),
-                        c.getLong(colTmdbId),
-                        c.getString(colOgTitle),
-                        c.getString(colBackdrop),
-                        c.getString(colVoteAvg)));
-            }
-
-            c.close();
             db.close();
 
             return movieList;
