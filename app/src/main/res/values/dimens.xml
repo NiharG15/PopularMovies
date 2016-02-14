@@ -10,4 +10,5 @@
     <dimen name="font_size_std">16sp</dimen>
     <dimen name="font_size_std_l">18sp</dimen>
     <dimen name="font_size_large">24sp</dimen>
+    <dimen name="grid_image_height">270dp</dimen>
 </resources>

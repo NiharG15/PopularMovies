@@ -58,8 +58,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class MovieFragment extends Fragment {
 
+    public static final String ARG_TWO_PANE = "2_pane";
+
     MovieGridAdapter mAdapter;
     GridView mMovieGrid;
+
+    private boolean mTwoPane = false;
+
+    public static MovieFragment newInstance(boolean twoPane) {
+        MovieFragment movieFragment = new MovieFragment();
+        Bundle b = new Bundle();
+        b.putBoolean(ARG_TWO_PANE, twoPane);
+        movieFragment.setArguments(b);
+        return movieFragment;
+    }
+
     public MovieFragment() {
         // Required empty public constructor
     }
@@ -69,6 +82,11 @@ public class MovieFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         // Inflate the layout for this fragment
+
+
+        mTwoPane = getArguments().getBoolean(ARG_TWO_PANE, false);
+
+
         View v = inflater.inflate(R.layout.fragment_movie, container, false);
 
         FetchDataTask dataTask = new FetchDataTask(getContext());
@@ -87,6 +105,13 @@ public class MovieFragment extends Fragment {
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(mTwoPane) {
+                    MovieDetailFragment detailFragment = MovieDetailFragment.newInstance((Movie) parent.getItemAtPosition(position));
+                    getFragmentManager().beginTransaction().replace(R.id.detailfrag_container, detailFragment).addToBackStack(null).commit();
+                    return;
+                }
+
                 Intent i = new Intent(getContext(), MovieDetailActivity.class);
                 i.putExtra(MovieDetailActivity.ARG_MOVIE, (Movie) parent.getItemAtPosition(position));
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

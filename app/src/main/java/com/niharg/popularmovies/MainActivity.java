@@ -8,14 +8,19 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean mTwoPane = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if(findViewById(R.id.detailfrag_container) != null) {
+            mTwoPane = true;
+        }
         if(savedInstanceState == null) {
-            MovieFragment movieFragment = new MovieFragment();
+            MovieFragment movieFragment = MovieFragment.newInstance(mTwoPane);
             getSupportFragmentManager().beginTransaction().replace(R.id.moviefrag_container, movieFragment, "movie_fragment").commit();
         }
     }
@@ -25,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(!getSupportFragmentManager().popBackStackImmediate())
+            super.onBackPressed();
     }
 
     @Override

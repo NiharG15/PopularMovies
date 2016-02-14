@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+<ImageView
+    android:id="@+id/thumbnail"
+    android:transitionName="poster"
+    android:scaleType="centerCrop"
+    android:layout_height="@dimen/grid_image_height"
+    android:layout_width="match_parent"
+    android:contentDescription="@string/content_desc_movie_poster"/>
+</LinearLayout>
