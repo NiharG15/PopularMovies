@@ -22,4 +22,5 @@
     <string name="string_no_favorites">No favorites.</string>
     <string name="string_review_network_error">Network Error.</string>
     <string name="string_share_trailer">Share Trailer</string>
+    <string name="string_trailer_not_loaded">Trailers not loaded.</string>
 </resources>

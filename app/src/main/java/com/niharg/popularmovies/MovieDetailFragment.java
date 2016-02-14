@@ -54,6 +54,7 @@ public class MovieDetailFragment extends Fragment {
     public static final String TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780";
 
     private MenuItem star;
+    private MenuItem share;
 
     private ImageView poster;
     private ImageView backdrop;
@@ -73,6 +74,8 @@ public class MovieDetailFragment extends Fragment {
 
     boolean trailerSharePrepared = false;
     private Uri trailerUri;
+
+    boolean offlineMode = false;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -146,6 +149,7 @@ public class MovieDetailFragment extends Fragment {
             new FetchReviewTask(getContext()).execute(mMovie.getId());
 
         } else {
+            offlineMode = true;
             Snackbar.make(container, "Offline Mode", Snackbar.LENGTH_LONG).show();
             reviewView.setVisibility(View.GONE);
             trailerView.setVisibility(View.GONE);
@@ -174,6 +178,11 @@ public class MovieDetailFragment extends Fragment {
             if(star != null) {
                 star.setIcon(R.drawable.ic_star_white_24dp);
             }
+        }
+
+        share = menu.findItem(R.id.share);
+        if(share != null && offlineMode) {
+            share.setVisible(false);
         }
     }
 
@@ -216,6 +225,8 @@ public class MovieDetailFragment extends Fragment {
             intent.putExtra(Intent.EXTRA_TEXT, trailerUri.toString());
             intent.setType("text/plain");
             startActivity(Intent.createChooser(intent, getString(R.string.string_share_trailer)));
+        } else {
+            Snackbar.make(mParent, getContext().getString(R.string.string_trailer_not_loaded), Snackbar.LENGTH_SHORT).show();
         }
 
         return false;
