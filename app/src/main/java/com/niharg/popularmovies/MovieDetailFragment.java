@@ -220,14 +220,17 @@ public class MovieDetailFragment extends Fragment {
             return true;
         }
 
-        if(item.getItemId() == R.id.share && trailerSharePrepared) {
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_TEXT, trailerUri.toString());
-            intent.setType("text/plain");
-            startActivity(Intent.createChooser(intent, getString(R.string.string_share_trailer)));
-        } else {
-            Snackbar.make(mParent, getContext().getString(R.string.string_trailer_not_loaded), Snackbar.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.share) {
+            if (trailerSharePrepared) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_TEXT, trailerUri.toString());
+                intent.setType("text/plain");
+                startActivity(Intent.createChooser(intent, getString(R.string.string_share_trailer)));
+            } else {
+                Snackbar.make(mParent, getContext().getString(R.string.string_trailer_not_loaded), Snackbar.LENGTH_SHORT).show();
+            }
         }
+
 
         return false;
     }
