@@ -14,7 +14,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -199,15 +198,11 @@ public class MovieDetailFragment extends Fragment {
 
                 Uri u = getContext().getContentResolver().insert(FavoritesProvider.Movies.CONTENT_URI, contentValues);
 
-                if(u != null)
-                Log.d("Row inserted: ", u.toString());
-
                 favorite = true;
             } else {
                 favorite = false;
                 item.setIcon(R.drawable.ic_star_border_white_24dp);
                 int n = getContext().getContentResolver().delete(FavoritesProvider.Movies.CONTENT_URI, DatabaseContract.MovieEntry.COL_TMDB_ID + "=?", new String[]{Long.toString(mMovie.getId())});
-                Log.d("Rows deleted: ", Integer.toString(n));
             }
             //db.close();
             return true;
