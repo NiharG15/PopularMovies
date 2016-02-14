@@ -71,6 +71,9 @@ public class MovieDetailFragment extends Fragment {
 
     private boolean favorite = false;
 
+    boolean trailerSharePrepared = false;
+    private Uri trailerUri;
+
     public MovieDetailFragment() {
         // Required empty public constructor
     }
@@ -96,7 +99,7 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-
+        trailerSharePrepared = false;
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         mParent = v;
@@ -208,6 +211,13 @@ public class MovieDetailFragment extends Fragment {
             return true;
         }
 
+        if(item.getItemId() == R.id.share && trailerSharePrepared) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT, trailerUri.toString());
+            intent.setType("text/plain");
+            startActivity(Intent.createChooser(intent, getString(R.string.string_share_trailer)));
+        }
+
         return false;
     }
 
@@ -252,6 +262,8 @@ public class MovieDetailFragment extends Fragment {
             super.onPostExecute(videos);
 
             if (videos != null && videos.size() != 0) {
+                trailerUri = Uri.parse(YT_VIDEO_BASE + videos.get(0).getKey());
+                trailerSharePrepared = true;
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
